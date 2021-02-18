@@ -1,0 +1,16 @@
+#! /usr/bin/env bash
+
+if [ "$(whoami)" != "root" ]
+then
+	echo "Use script as root"
+	exit 1
+fi
+
+cd /data/bind9
+mv /tmp/bind9.zip .
+echo -n "Decompressing... "
+unzip -o bind9.zip > /dev/null && echo done || echo KO
+rm bind9.zip
+sed -i "s/192.168.1.0\/24/$(dig +short yann5.hexanyn.fr)/g" bind/etc/named.conf.options
+echo -n "Restarting... "
+/usr/bin/docker-compose restart 2>/dev/null && echo done || echo KO
